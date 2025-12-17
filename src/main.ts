@@ -24,9 +24,10 @@ function run(): void {
     const artifact = toBooleanString(core.getInput('artifact'));
     const graph = (core.getInput('graph') || 'mermaid').trim();
     const title = core.getInput('title')?.trim() || 'OctoFlow';
+    const runIdInput = core.getInput('run-id');
 
     const { owner, repo } = github.context.repo;
-    const runId = String(github.context.runId);
+    const runId = (runIdInput?.trim() || String(github.context.runId));
     const sha = github.context.sha;
 
     core.saveState('token', token);

@@ -28,6 +28,7 @@ jobs:
 - `artifact` (optional): `true`/`false` flag to decide whether to upload the normalized `octoflow.json` artifact. Defaults to `true`.
 - `graph` (optional): Graph format to render; only `mermaid` is supported today.
 - `title` (optional): Heading text shown above the summary graph.
+- `run-id` (optional): Override the workflow run ID that OctoFlow summarizes (useful when you call the action from a follow-up `workflow_run` workflow).
 
 ## Permissions
 

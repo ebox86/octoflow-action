@@ -37,3 +37,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           title: Self-test pipeline
           artifact: true
+          run-id: ${{ github.event.workflow_run.id }}

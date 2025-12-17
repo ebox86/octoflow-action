@@ -5,6 +5,9 @@ inputs:
   github-token:
     description: "Token used to call the GitHub Actions API."
     required: true
+  run-id:
+    description: "Optional workflow run id to summarize (useful for workflow_run consumers)."
+    required: false
   artifact:
     description: "Upload the normalized `octoflow.json` artifact when true."
     required: false
