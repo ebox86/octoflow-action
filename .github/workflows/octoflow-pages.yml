@@ -26,7 +26,7 @@ jobs:
       # 2) checkout octoflow-web (the viewer template) into a subfolder
       - uses: actions/checkout@v4
         with:
-          repository: YOUR_GH/octoflow-web   # <-- CHANGE
+          repository: ebox86/octoflow-web
           path: .octoflow-web
 
       - uses: actions/setup-node@v4
