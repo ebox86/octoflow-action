@@ -1,0 +1,22 @@
+name: "OctoFlow"
+description: "Visual GitHub Actions pipeline summary + optional external viewer link"
+author: "Evan"
+inputs:
+  github-token:
+    description: "Token to call GitHub API"
+    required: true
+  publish:
+    description: "none | check"
+    required: false
+    default: "check"
+  viewer-url:
+    description: "Base URL of OctoFlow web viewer (used when publish=check)"
+    required: false
+    default: ""
+runs:
+  using: "node20"
+  main: "dist/index.js"
+branding:
+  icon: "activity"
+  color: "purple"
+
