@@ -5,6 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 
+type OctokitClient = ReturnType<typeof github.getOctokit>;
+
+type WorkflowRunResponseData = Awaited<ReturnType<OctokitClient['rest']['actions']['getWorkflowRun']>>['data'];
+
 type StepInfo = {
   name: string;
   status: string;
@@ -157,6 +161,36 @@ function toBoolean(value: string | undefined): boolean {
   return !['0', 'false', 'no', 'off'].includes(normalized);
 }
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForRunCompletion(
+  octokit: OctokitClient,
+  owner: string,
+  repo: string,
+  runId: number
+): Promise<WorkflowRunResponseData> {
+  const maxWaitMs = 30_000;
+  const pollIntervalMs = 2_000;
+  let waitedMs = 0;
+  let response = await octokit.rest.actions.getWorkflowRun({ owner, repo, run_id: runId });
+  let runData = response.data;
+
+  while (runData.status !== 'completed' && waitedMs < maxWaitMs) {
+    await delay(pollIntervalMs);
+    waitedMs += pollIntervalMs;
+    response = await octokit.rest.actions.getWorkflowRun({ owner, repo, run_id: runId });
+    runData = response.data;
+  }
+
+  if (runData.status !== 'completed') {
+    core.warning('Workflow run never reached completed status before the summary step finished.');
+  }
+
+  return runData;
+}
+
 async function run(): Promise<void> {
   try {
     const token = parseState('token');
@@ -179,12 +213,7 @@ async function run(): Promise<void> {
 
     const octokit = github.getOctokit(token);
 
-    const runResponse = await octokit.rest.actions.getWorkflowRun({
-      owner,
-      repo,
-      run_id: runId
-    });
-    const runData = runResponse.data;
+    const runData = await waitForRunCompletion(octokit, owner, repo, runId);
 
     const rawJobs = (await octokit.paginate(
       octokit.rest.actions.listJobsForWorkflowRun,
