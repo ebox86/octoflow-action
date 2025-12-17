@@ -98,6 +98,10 @@ function statusIcon(job: JobNode): string {
 }
 
 function mermaidFlowLR(jobs: JobNode[], edges: Edge[]): string {
+  if (jobs.length === 0) {
+    return '```mermaid\nflowchart LR\n```';
+  }
+
   const sanitizeId = (value: string) => value.replace(/[^a-zA-Z0-9_]/g, '_');
   const lines: string[] = ['flowchart LR'];
 
@@ -108,6 +112,7 @@ function mermaidFlowLR(jobs: JobNode[], edges: Edge[]): string {
   }
 
   for (const [from, to] of edges) {
+    if (jobs.length === 0) break;
     const fromName = mapJobIdToApiName(from, jobs);
     const toName = mapJobIdToApiName(to, jobs);
 
@@ -181,13 +186,18 @@ async function run(): Promise<void> {
     });
     const runData = runResponse.data;
 
-    const rawJobs = await octokit.paginate(
+    const rawJobs = (await octokit.paginate(
       octokit.rest.actions.listJobsForWorkflowRun,
       { owner, repo, run_id: runId, per_page: 100 },
       (response) => response.data.jobs
-    );
+    )) as Array<Record<string, unknown> | null>;
+    const knownJobs = rawJobs.filter((job): job is Record<string, unknown> => Boolean(job));
 
-    const jobs: JobNode[] = rawJobs.map((job) => ({
+    if (knownJobs.length === 0) {
+      core.warning('No jobs were returned for the current workflow run.');
+    }
+
+    const jobs: JobNode[] = (knownJobs as any[]).map((job) => ({
       id: job.id,
       name: job.name,
       status: job.status,
