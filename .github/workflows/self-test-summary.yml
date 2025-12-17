@@ -1,0 +1,28 @@
+name: OctoFlow self-test summary
+
+on:
+  workflow_run:
+    workflows:
+      - OctoFlow self-test
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  self-test-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate OctoFlow summary for completed run
+        uses: ./
+        env:
+          GITHUB_RUN_ID: ${{ github.event.workflow_run.id }}
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          title: Self-test pipeline
+          artifact: true

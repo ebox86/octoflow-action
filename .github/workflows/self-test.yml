@@ -34,10 +34,3 @@ jobs:
 
       - name: Dummy success step
         run: echo "this step succeeds"
-
-      - name: Run OctoFlow summary
-        uses: ./
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          title: Self-test pipeline
-          artifact: true
