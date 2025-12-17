@@ -5,9 +5,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
-  checks: write
   contents: read
+  actions: read
+  pull-requests: write
+  issues: write
 
 jobs:
   test:

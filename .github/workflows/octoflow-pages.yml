@@ -1,0 +1,63 @@
+name: OctoFlow Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *" # every 15 min
+
+permissions:
+  actions: read
+  deployments: read
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: octoflow-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) checkout THIS repo (the one we're visualizing)
+      - uses: actions/checkout@v4
+
+      # 2) checkout octoflow-web (the viewer template) into a subfolder
+      - uses: actions/checkout@v4
+        with:
+          repository: YOUR_GH/octoflow-web   # <-- CHANGE
+          path: .octoflow-web
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: .octoflow-web/package-lock.json
+
+      # 3) generate snapshot JSON for this repo
+      - name: Generate OctoFlow snapshot
+        working-directory: .octoflow-web
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OCTOFLOW_OWNER: ${{ github.repository_owner }}
+          OCTOFLOW_REPO: ${{ github.event.repository.name }}
+        run: |
+          npm ci
+          node scripts/snapshot.mjs
+
+      # 4) build static site
+      - name: Build viewer
+        working-directory: .octoflow-web
+        run: |
+          npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .octoflow-web/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4
