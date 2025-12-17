@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && ncc build dist-ts/index.js -o dist",
+    "build": "tsc -p tsconfig.json && rm -rf dist dist-main dist-post && ncc build dist-ts/main.js -o dist-main --source-map && ncc build dist-ts/post.js -o dist-post --source-map && mkdir -p dist && mv dist-main/index.js dist/main.js && mv dist-main/index.js.map dist/main.js.map && mv dist-post/index.js dist/post.js && mv dist-post/index.js.map dist/post.js.map && rm -rf dist-main dist-post",
     "format": "prettier -w ."
   },
   "keywords": [],

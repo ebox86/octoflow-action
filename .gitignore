@@ -1,9 +1,9 @@
 node_modules
 .env
-dist
 dist-ts
 coverage
 .vscode
 .idea
 *.log
 .DS_Store
+dist

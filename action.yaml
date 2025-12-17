@@ -1,18 +1,22 @@
 name: "OctoFlow"
-description: "Visual GitHub Actions pipeline summary + optional external viewer link"
+description: "Render a Mermaid job graph directly in the workflow summary."
 author: "Evan"
 inputs:
   github-token:
-    description: "Token to call GitHub API"
+    description: "Token used to call the GitHub Actions API."
     required: true
-  publish:
-    description: "none | check"
+  artifact:
+    description: "Upload the normalized `octoflow.json` artifact when true."
     required: false
-    default: "check"
-  viewer-url:
-    description: "Base URL of OctoFlow web viewer (used when publish=check)"
+    default: "true"
+  graph:
+    description: "Graph format to render (only `mermaid` supported today)."
     required: false
-    default: ""
+    default: "mermaid"
+  title:
+    description: "Heading to show above the summary graph."
+    required: false
+    default: "OctoFlow"
 runs:
   using: "node20"
   main: "dist/main.js"
