@@ -42,6 +42,18 @@ permissions:
 
 OctoFlow uses the `runs.main` entrypoint to capture input/state and the `runs.post` entrypoint to fetch the run/jobs/steps, build the Mermaid graph, and append markdown to `$GITHUB_STEP_SUMMARY`. Because it runs in a post hook, the summary only renders after the job completes and cannot be updated while steps are still running.
 
+## Why OctoFlow
+
+- Renders a Mermaid graph and job table in the job summary so teammates can digest pipeline structure, status, and durations without leaving the run view.
+- Keeps permissions scoped to `contents: read` and `actions: read` while still producing a reusable `octoflow.json` artifact for dashboards or downstream workflows.
+- Powers the OctoFlow Viewer (`octoflow-web`) that builds a static dashboard on GitHub Pages; the viewer still depends on this action’s data so it isn’t deprecated.
+
+## Testing the Mermaid chart
+
+- Run `.github/workflows/self-test.yml`, wait for completion, and inspect the “Job summary” tab for the final job; the Mermaid block under “Pipeline” renders once GitHub marks the job finished.
+- The `.github/workflows/self-test-summary.yml` workflow triggers on `workflow_run.completed` and reruns the action against the finished run so the Mermaid graph includes all jobs rather than racing against an in-progress run.
+- You can also inspect the published `octoflow.json` artifact or load it into the OctoFlow Viewer to verify the structure outside of GitHub (build locally with `npm run build` and reuse the payload in a custom renderer if needed).
+
 ## Artifact
 
 When `artifact: true`, OctoFlow writes a normalized `octoflow.json` (versioned payload with the run, jobs, steps, and workflow edges) and uploads it as the `octoflow` artifact. That payload can power custom viewers or be consumed by downstream workflows.
